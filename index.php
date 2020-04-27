@@ -34,7 +34,14 @@ if ( isset($_POST['clear']) && $USER->instructor ) {
     header( 'Location: '.addSession('index.php') ) ;
     return;
 } 
+if(isset($_POST['grade'])){
+    $_SESSION['success'] = __('Note trouvee');
+    $grade = intval($_POST['grade']);
+    $RESULT->gradeSend($grade, true);
+    header( 'Location: '.addSession('index.php') ) ;
+    return;
 
+}
 if ( isset($_POST['code']) ) { // Student
     if ( $old_code != $_POST['code'] ) {
         $_SESSION['error'] = __('Code incorrect');
@@ -70,12 +77,12 @@ if ( isset($_POST['code']) ) { // Student
         )
     );
 
-    if ( $send_grade && isset($LAUNCH->link) && $LAUNCH->link ) {
+  /*  if ( $send_grade && isset($LAUNCH->link) && $LAUNCH->link ) {
         if ($LAUNCH->result && $LAUNCH->result->id && $RESULT->grade < 1.0 ) {
             $RESULT->gradeSend(1.0, false);
         }
     }
-
+*/
     $_SESSION['success'] = __('Attendance Recorded...');
     header( 'Location: '.addSession('index.php') ) ;
     return;
@@ -114,7 +121,7 @@ if ( $USER->instructor ) {
     $OUTPUT->welcomeUserCourse();
     echo('<br clear="all">');
     SettingsForm::start();
-    echo("<p>Configure the LTI Tool<p>\n");
+    echo("<p>__('Configure the LTI Tool')<p>\n");
     SettingsForm::text('code',__('Code'));
     SettingsForm::checkbox('grade',__('Send a grade'));
     SettingsForm::text('match',__('This can be a prefix of an IP address like "142.16.41" or if it starts with a "/" it can be a regular expression (PHP syntax)'));
@@ -125,7 +132,8 @@ if ( $USER->instructor ) {
 
 $OUTPUT->flashMessages();
 
-echo("<!-- Classic single-file version of the tool -->\n");
+echo("HELLO<!-- Classic single-file version of the tool -->\n");
+
 
 // Ask the user for the code
 if ( $USER->instructor ) {
@@ -136,10 +144,13 @@ if ( $USER->instructor ) {
         echo(__("You can use the settings link to change the attendance code."));
     }
     echo("</p>\n");
-} else {
+} else { //Student
+    echo("Votre note actuelle est : ".$RESULT->grade."\n");//AJOUT ED 2020
     echo('<form method="post">');
-    echo(__("Enter code:")."\n");
-    echo('<input type="text" name="code" value=""> ');
+  //  echo(__("Enter code:")."\n");
+  //  echo('<input type="text" name="code" value=""> ');
+    echo(__("Enter grade:")."\n");
+   echo('<input type="text" name="grade" value=""> '); //AJOUT ED 2020
     echo('<input type="submit" class="btn btn-normal" name="set" value="'.__('Record attendance').'"><br/>');
     echo("\n</form>\n");
 }
